@@ -231,6 +231,10 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
       ERRORS[OUTPUT_NOT_BMP] = 1;
     }
 
+    if (strcmp(a->password, "") != 0) {
+      a->cypher_mode = 1;
+    }
+
     // validate inputs
     for (int i = 0; i < NO_ERRORS; i++) {
       if (ERRORS[i]) {
@@ -272,7 +276,7 @@ int main(int argc, char **argv) {
       {"block-mode", 'm', "ECB | CBF | OFB | CBC", OPTION_ARG_OPTIONAL,
        "Block mode."},
       {"pass", 993, "TEXT", OPTION_ARG_OPTIONAL,
-       "Cypher if not present, other cypher parameters are ignored."},
+       "Cypher password. If not present, other cypher parameters are ignored."},
       {0}};
 
   struct argp argp = {options, parse_opt, 0,
