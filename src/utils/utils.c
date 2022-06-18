@@ -41,6 +41,12 @@ int read_secret_message(const char *filename, char **data) {
       if (ferror(fp) != 0) {
         fputs("Error reading file", stderr);
       }
+
+      if (source) {
+        fread(source, 1, buff_size, fp);
+      }
+
+      fclose(fp);
     }
   }
 
@@ -50,8 +56,8 @@ int read_secret_message(const char *filename, char **data) {
   *data = malloc(sizeof(char) * message_size);
 
   memcpy(*data, &buff_size, sizeof(int));
-  memcpy((*data)+sizeof(int), source, buff_size);
-  memcpy((*data)+sizeof(int)+buff_size, ext, ext_size);
+  memcpy((*data) + sizeof(int), source, buff_size);
+  memcpy((*data) + sizeof(int) + buff_size, ext, ext_size);
 
   free(source);
   return message_size;

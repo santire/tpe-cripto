@@ -305,7 +305,9 @@ int main(int argc, char **argv) {
     int secret_size =
         read_secret_message(arguments.secret_file, &secret_message);
 
-    printf("len: %d\n", secret_size);
+
+
+    printf("len: %d\n", (int)(*secret_message));
     printf("message: %s\n", secret_message);
     for (int i = 0; i < secret_size; i++) {
       if (i >= 4) {
@@ -318,6 +320,7 @@ int main(int argc, char **argv) {
 
     if (arguments.cypher_mode) {
       printf("Encrypting message...\n");
+      // int error = encrypt(secret_message, secret_size, arguments.encryption_algorithm, arguments.block_algorithm)
     }
 
     // struct t_embed_params embed_params = {porter_file, output_file,
