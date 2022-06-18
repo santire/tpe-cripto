@@ -1,6 +1,10 @@
+#include "embed/embed.h"
+#include "extract/extract.h"
 #include "utils/utils.h"
+
 #include <argp.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <strings.h>
 
 const char *argp_pogram_bug_address = "sreyes@itba.edu.ar";
@@ -10,7 +14,7 @@ const char *STEG_MODES[] = {"LSB1", "LSB4", "LSBI", 0};
 const char *ENCRYPT_MODES[] = {"AES128", "AES192", "AES256", "DES", 0};
 const char *BLOCK_MODES[] = {"ECB", "CFB", "OFB", "CBC", 0};
 
-enum t_steg { LSB1 = 1, LSB4, LSBI };
+// These should go to the corresponding encrypt/encrypt.h file
 enum t_encrypt { AES128 = 1, AES192, AES256, DES };
 enum t_block { ECB = 1, CFB, OFB, CBC };
 
@@ -106,6 +110,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
     if (arg == NULL) {
       ERRORS[MISSING_ARG] = 1;
     } else {
+      // TODO: Check if file exists
       a->secret_file = arg;
     }
     break;
@@ -134,6 +139,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
     if (arg == NULL) {
       ERRORS[MISSING_ARG] = 1;
     } else {
+      // TODO: Check if not exists || is overridable
       a->out_file = arg;
     }
     break;
@@ -156,7 +162,6 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
 
   case 'a': {
     if (arg == NULL) {
-      printf("a is null for some reason :(\n");
       ERRORS[MISSING_ARG] = 1;
     } else {
       arg = *arg == '=' ? arg + 1 : arg;
@@ -290,6 +295,47 @@ int main(int argc, char **argv) {
   if (retval != 0) {
     printf("%d\n", retval);
     return retval;
+  }
+
+  if (arguments.embed_mode) {
+    FILE *porter_file = fopen(arguments.porter_file, "rb");
+    FILE *output_file = fopen(arguments.out_file, "wb+");
+
+    char *secret_message = (char *)calloc(1, sizeof(char *));
+    int secret_size =
+        read_secret_message(arguments.secret_file, &secret_message);
+
+    printf("len: %d\n", secret_size);
+    printf("message: %s\n", secret_message);
+    for (int i = 0; i < secret_size; i++) {
+      if (i >= 4) {
+        putc(secret_message[i], stdout);
+      }
+    }
+    printf("\n");
+
+    fwrite(secret_message, sizeof(char *), 1, output_file);
+
+    if (arguments.cypher_mode) {
+      printf("Encrypting message...\n");
+    }
+
+    // struct t_embed_params embed_params = {porter_file, output_file,
+    // secret_message,
+    //                                       secret_size, arguments.steg_mode};
+    printf("Embedding file...\n");
+    // embed(&embed_params);
+
+    fclose(porter_file);
+    fclose(output_file);
+  }
+
+  if (arguments.extract_mode) {
+    if (arguments.cypher_mode) {
+      printf("Decrypting message...\n");
+    }
+    printf("Extracting file...\n");
+    // embed(.....)
   }
 
   // Debug
