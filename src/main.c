@@ -298,39 +298,40 @@ int main(int argc, char **argv) {
   }
 
   if (arguments.embed_mode) {
-    FILE *porter_file = fopen(arguments.porter_file, "rb");
-    FILE *output_file = fopen(arguments.out_file, "wb+");
+    // FILE *porter_file = fopen(arguments.porter_file, "rb");
+    // FILE *output_file = fopen(arguments.out_file, "wb+");
 
-    char *secret_message = (char *)calloc(1, sizeof(char *));
-    int secret_size =
-        read_secret_message(arguments.secret_file, &secret_message);
+    // char *secret_message = (char *)calloc(1, sizeof(char *));
+    // int secret_size =
+    //     read_secret_message(arguments.secret_file, &secret_message);
 
 
 
-    printf("len: %d\n", (int)(*secret_message));
-    printf("message: %s\n", secret_message);
-    for (int i = 0; i < secret_size; i++) {
-      if (i >= 4) {
-        putc(secret_message[i], stdout);
-      }
-    }
-    printf("\n");
+    // printf("len: %d\n", (int)(*secret_message));
+    // printf("message: %s\n", secret_message);
+    // for (int i = 0; i < secret_size; i++) {
+    //   if (i >= 4) {
+    //     putc(secret_message[i], stdout);
+    //   }
+    // }
+    // printf("\n");
 
-    fwrite(secret_message, sizeof(char *), 1, output_file);
+    // fwrite(secret_message, sizeof(char *), 1, output_file);
 
     if (arguments.cypher_mode) {
       printf("Encrypting message...\n");
+      // TODO: Funcion a implementar
       // int error = encrypt(secret_message, secret_size, arguments.encryption_algorithm, arguments.block_algorithm)
     }
 
     // struct t_embed_params embed_params = {porter_file, output_file,
     // secret_message,
     //                                       secret_size, arguments.steg_mode};
-    printf("Embedding file...\n");
-    // embed(&embed_params);
+    // printf("Embedding file...\n");
+    // // embed(&embed_params);
 
-    fclose(porter_file);
-    fclose(output_file);
+    // fclose(porter_file);
+    // fclose(output_file);
   }
 
   if (arguments.extract_mode) {
