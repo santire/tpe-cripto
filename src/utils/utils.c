@@ -13,14 +13,16 @@ const char *get_file_ext(const char *filename) {
 int read_secret_message(const char *filename, char **data) {
   const char *ext = strrchr(filename, '.');
   char *source = NULL;
-  int buff_size = -1;
-  FILE *fp = fopen(filename, "r");
+  unsigned int buff_size = -1;
+  FILE *fp = fopen(filename, "rb");
+  int byte_size = sizeof(unsigned int);
 
   if (fp != NULL) {
     // Go to the end of the file
     if (fseek(fp, 0L, SEEK_END) == 0) {
       // Get the size of the file
       buff_size = ftell(fp);
+      printf("Buff size: %d\n", buff_size);
       if (buff_size == -1) {
         // TODO: Better error handling
         fputs("Error reading file", stderr);
@@ -45,19 +47,19 @@ int read_secret_message(const char *filename, char **data) {
       if (source) {
         fread(source, 1, buff_size, fp);
       }
-
-      fclose(fp);
     }
+
+    fclose(fp);
   }
 
   int ext_size = strlen(ext) + 1; // one for \0
-  int message_size = sizeof(int) + buff_size + ext_size;
+  int message_size = byte_size + buff_size + ext_size;
 
-  *data = malloc(sizeof(char) * message_size);
+  *data = (char *)calloc(message_size, sizeof(char));
 
-  memcpy(*data, &buff_size, sizeof(int));
-  memcpy((*data) + sizeof(int), source, buff_size);
-  memcpy((*data) + sizeof(int) + buff_size, ext, ext_size);
+  memcpy(*data, &buff_size, byte_size);
+  memcpy((*data) + byte_size, source, buff_size);
+  memcpy((*data) + byte_size + buff_size, ext, ext_size);
 
   free(source);
   return message_size;
