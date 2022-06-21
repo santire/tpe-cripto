@@ -67,6 +67,7 @@ struct arguments {
   const char *password;
 };
 void print_arguments(struct arguments a) {
+  printf("###############################\n");
   printf("Arguments: \n");
   printf("Embed mode: %d\n", a.embed_mode);
   printf("Extract mode: %d\n", a.extract_mode);
@@ -78,6 +79,7 @@ void print_arguments(struct arguments a) {
   printf("Encryption algorithm: %d\n", a.encryption_algorithm);
   printf("Block algorithm: %d\n", a.block_algorithm);
   printf("Password: %s\n", a.password);
+  printf("###############################\n");
 }
 
 static int parse_opt(int key, char *arg, struct argp_state *state) {
@@ -122,8 +124,8 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
       const char *ext = get_file_ext(arg);
       if (strcmp(ext, "bmp") == 0) {
         FILE *file;
-        // Check if file is writeable
-        if ((file = fopen(arg, "w"))) {
+        // Check if file is readable
+        if ((file = fopen(arg, "rb"))) {
           fclose(file);
           a->porter_file = arg;
         } else {
@@ -301,16 +303,15 @@ int main(int argc, char **argv) {
     FILE *porter_file = fopen(arguments.porter_file, "rb");
     FILE *output_file = fopen(arguments.out_file, "wb+");
 
-    char *secret_message;
+    char *secret_message = NULL;
     int secret_size =
         read_secret_message(arguments.secret_file, &secret_message);
-
 
     // First byte is data size
     unsigned int data_size = (unsigned int)(*secret_message);
 
     // Beginning of message
-    char *message = secret_message+sizeof(unsigned int);
+    char *message = secret_message + sizeof(unsigned int);
 
     fwrite(message, 1, data_size, output_file);
 
@@ -320,11 +321,11 @@ int main(int argc, char **argv) {
       // arguments.encryption_algorithm, arguments.block_algorithm)
     }
 
-    // struct t_embed_params embed_params = {porter_file, output_file,
-    // secret_message,
-    //                                       secret_size, arguments.steg_mode};
+    struct t_embed_params embed_params = {porter_file, output_file,
+                                          secret_message, secret_size,
+                                          arguments.steg_mode};
     printf("Embedding file...\n");
-    // embed(&embed_params);
+    embed(&embed_params);
 
     free(secret_message);
     fclose(porter_file);
