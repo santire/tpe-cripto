@@ -78,7 +78,7 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
     return -1;
   }
 
-  fread(&(bmp->ih), sizeof(unsigned char), sizeof(FILEHEADER), fp);
+  fread(&(bmp->ih), sizeof(unsigned char), sizeof(INFOHEADER), fp);
 
   // Move fp to the beginning of bitmap data
   fseek(fp, bmp->fh.imageDataOffset, SEEK_SET);
