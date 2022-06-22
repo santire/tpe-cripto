@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <byteswap.h>
 
 // https://stackoverflow.com/questions/17967480/parse-read-bitmap-file-in-c
 // https://stackoverflow.com/questions/14279242/read-bitmap-file-into-structure
@@ -43,11 +44,14 @@ struct t_bmp {
   unsigned char *img;
 };
 
+
 // Returns file extension.
 // TODO: Probably should change to (const char *filename, char *dest) -> int
 const char *get_file_ext(const char *filename);
 
 int parse_bmp_file(FILE *fp, struct t_bmp *bmp);
+int write_bmp_file(FILE *fp, struct t_bmp *bmp);
+
 // Reads message to hide and loads it into memory
 // as (Size (4 bytes) || message || extension). Returns size.
 int read_secret_message(const char *filename, char **data);

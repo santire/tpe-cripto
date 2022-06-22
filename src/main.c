@@ -299,21 +299,14 @@ int main(int argc, char **argv) {
     return retval;
   }
 
-  if (arguments.embed_mode) {
-    FILE *porter_file = fopen(arguments.porter_file, "rb");
-    FILE *output_file = fopen(arguments.out_file, "wb+");
+  FILE *porter_file = fopen(arguments.porter_file, "rb");
 
+  if (arguments.embed_mode) {
+
+    FILE *output_file = fopen(arguments.out_file, "wb+");
     char *secret_message = NULL;
     int secret_size =
         read_secret_message(arguments.secret_file, &secret_message);
-
-    // First byte is data size
-    unsigned int data_size = (unsigned int)(*secret_message);
-
-    // Beginning of message
-    char *message = secret_message + sizeof(unsigned int);
-
-    fwrite(message, 1, data_size, output_file);
 
     if (arguments.cypher_mode) {
       printf("Encrypting message...\n");
@@ -321,15 +314,17 @@ int main(int argc, char **argv) {
       // arguments.encryption_algorithm, arguments.block_algorithm)
     }
 
-    struct t_embed_params embed_params = {porter_file, output_file,
-                                          secret_message, secret_size,
-                                          arguments.steg_mode};
+    struct t_embed_params embed_params = {porter_file, secret_message,
+                                          secret_size, arguments.steg_mode};
     printf("Embedding file...\n");
-    embed(&embed_params);
+    struct t_bmp out_bmp;
+    embed(&embed_params, &out_bmp);
 
-    free(secret_message);
-    fclose(porter_file);
+    write_bmp_file(output_file, &out_bmp);
     fclose(output_file);
+
+    free(out_bmp.img);
+    free(secret_message);
   }
 
   if (arguments.extract_mode) {
@@ -337,8 +332,32 @@ int main(int argc, char **argv) {
       printf("Decrypting message...\n");
     }
     printf("Extracting file...\n");
-    // embed(.....)
+
+    char *output = NULL;
+    char *ext = NULL;
+    struct t_extract_params extract_params = {porter_file, &output, &ext,
+                                              arguments.steg_mode};
+    struct t_bmp in_bmp;
+    extract(&extract_params, &in_bmp);
+    char *filename =
+        (char *)malloc(strlen(arguments.out_file) + strlen(ext) + 1);
+    strcpy(filename, arguments.out_file);
+    strcat(filename, ext);
+
+    FILE *output_file = fopen(filename, "wb+");
+
+    unsigned int message_size = (unsigned int)(*output);
+    printf("message size: %u\n", message_size);
+
+    fwrite(output+sizeof(unsigned int), sizeof(char), message_size, output_file);
+    fclose(output_file);
+
+    free(output);
+    free(in_bmp.img);
+    free(filename);
   }
+
+  fclose(porter_file);
 
   // Debug
   print_arguments(arguments);

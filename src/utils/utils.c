@@ -80,11 +80,17 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
 
   fread(&(bmp->ih), sizeof(unsigned char), sizeof(INFOHEADER), fp);
 
+  // Verify no compression
+  if (bmp->ih.biCompression != 0) {
+    printf("BMP FILE MUST NOT BE COMPRESSED\n");
+    return -1;
+  }
+
   // Move fp to the beginning of bitmap data
   fseek(fp, bmp->fh.imageDataOffset, SEEK_SET);
 
   // Allocate enough memory for the bitmap image data
-  bmp->img = (unsigned char*) malloc(bmp->ih.biSizeImage);
+  bmp->img = (unsigned char *)malloc(bmp->ih.biSizeImage);
 
   // Verify memory allocation
   if (!bmp->img) {
@@ -95,6 +101,14 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
 
   // Read image into the bitmap image data
   fread(bmp->img, bmp->ih.biSizeImage, 1, fp);
+
+  return 0;
+}
+
+int write_bmp_file(FILE *fp, struct t_bmp *bmp) {
+  fwrite(&bmp->fh, 1, sizeof(FILEHEADER), fp);
+  fwrite(&bmp->ih, 1, sizeof(INFOHEADER), fp);
+  fwrite(bmp->img, bmp->ih.biSizeImage, sizeof(unsigned char), fp);
 
   return 0;
 }
