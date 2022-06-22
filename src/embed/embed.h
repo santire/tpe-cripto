@@ -17,8 +17,10 @@ struct t_embed_params {
 struct t_extract_params {
   FILE *porter_file;
 
-  char **output;
-  char **ext;
+  unsigned char **output;
+  unsigned char **ext;
+  
+  unsigned int *message_size;
 
   enum t_steg steg_type;
 };

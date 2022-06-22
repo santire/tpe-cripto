@@ -48,17 +48,26 @@ int read_secret_message(const char *filename, char **data) {
   const char *ext = strrchr(filename, '.');
   char *buffer = NULL;
   unsigned int buff_size = -1;
+  unsigned int be_buff_size = 0;
   FILE *fp = fopen(filename, "rb");
   int byte_size = sizeof(unsigned int);
 
   buff_size = read_file(fp, &buffer);
+  int num = 1;
+  if (*(char *)&num == 1) {
+    // Little Endian
+    be_buff_size = __bswap_32(buff_size);
+  } else {
+    // Big Endian
+    be_buff_size = buff_size;
+  }
 
   int ext_size = strlen(ext) + 1; // one for \0
   int message_size = byte_size + buff_size + ext_size;
 
   *data = (char *)calloc(message_size, sizeof(char));
 
-  memcpy(*data, &buff_size, byte_size);
+  memcpy(*data, &be_buff_size, byte_size);
   memcpy((*data) + byte_size, buffer, buff_size);
   memcpy((*data) + byte_size + buff_size, ext, ext_size);
 

@@ -333,23 +333,24 @@ int main(int argc, char **argv) {
     }
     printf("Extracting file...\n");
 
-    char *output = NULL;
-    char *ext = NULL;
-    struct t_extract_params extract_params = {porter_file, &output, &ext,
-                                              arguments.steg_mode};
+    unsigned char *output = NULL;
+    unsigned char *ext = NULL;
+    unsigned int message_size = 0;
+    struct t_extract_params extract_params = {
+        porter_file, &output, &ext, &message_size, arguments.steg_mode};
     struct t_bmp in_bmp;
     extract(&extract_params, &in_bmp);
     char *filename =
-        (char *)malloc(strlen(arguments.out_file) + strlen(ext) + 1);
+        (char *)malloc(strlen(arguments.out_file) + strlen((char *)ext) + 1);
     strcpy(filename, arguments.out_file);
-    strcat(filename, ext);
+    strcat(filename, (char *)ext);
 
     FILE *output_file = fopen(filename, "wb+");
 
-    unsigned int message_size = (unsigned int)(*output);
     printf("message size: %u\n", message_size);
 
-    fwrite(output+sizeof(unsigned int), sizeof(char), message_size, output_file);
+    fwrite(output + sizeof(unsigned int), sizeof(char), message_size,
+           output_file);
     fclose(output_file);
 
     free(output);
@@ -361,6 +362,9 @@ int main(int argc, char **argv) {
 
   // Debug
   print_arguments(arguments);
+  printf("sizeof(char)=%lu\n", sizeof(char));
+  printf("sizeof(unsigned char)=%lu\n", sizeof(unsigned char));
+  printf("sizeof(size_t)=%lu\n", sizeof(size_t));
 
   return 0;
 }

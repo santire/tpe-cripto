@@ -2,22 +2,7 @@
 #include "../utils/utils.h"
 
 int embed_lsbn(struct t_bmp *bmp, char *message, int message_size, int n);
-int extract_lsbn(struct t_bmp *bmp, char **output, int n);
-
-// int embed_lsb1(struct t_bmp *bmp, FILE *out_file, char *message,
-//                int message_size) {
-
-//   // In LSB1 I can only change 1 bit per byte
-//   printf("Max hideable bits: %d\n", bmp->ih.biSizeImage);
-//   printf("Max hideable bytes: %d\n", bmp->ih.biSizeImage / 8);
-
-//   if (message_size > bmp->ih.biSizeImage / 8) {
-//     printf("CANT HIDE THIS FILE IN THIS PORTER");
-//     return -1;
-//   }
-
-//   return 0;
-// }
+int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n);
 
 int embed(struct t_embed_params *p, struct t_bmp *bmp) {
   parse_bmp_file(p->porter_file, bmp);
@@ -64,7 +49,17 @@ int extract(struct t_extract_params *p, struct t_bmp *bmp) {
     return -1;
   }
 
-  unsigned int message_size = (unsigned int)(**p->output);
+  unsigned int message_size = 0;
+  unsigned char *o = *p->output;
+
+  message_size |= (o[0] << 24);
+  message_size |= (o[1] << 16);
+  message_size |= (o[2] << 8);
+  message_size |= (o[3]);
+  printf("\n");
+  printf("message size?? %u\n", message_size);
+
+  *p->message_size = message_size;
   *p->ext = *p->output + message_size + sizeof(unsigned int);
   printf("Extension? %s\n", *p->ext);
 
@@ -85,11 +80,11 @@ int embed_lsbn(struct t_bmp *bmp, char *message, int message_size, int n) {
   return 0;
 }
 
-int extract_lsbn(struct t_bmp *bmp, char **output, int n) {
+int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n) {
   // Calculate max possible output size
   int max_size = (bmp->ih.biSizeImage * n) / 8;
   printf("max size: %d\n", max_size);
-  *output = (char *)calloc(max_size, sizeof(unsigned char));
+  *output = (unsigned char *)calloc(max_size, sizeof(unsigned char));
 
   unsigned char mask = (1 << n) - 1;
   int byte = 0;
