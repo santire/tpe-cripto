@@ -14,9 +14,6 @@ const char *STEG_MODES[] = {"LSB1", "LSB4", "LSBI", 0};
 const char *ENCRYPT_MODES[] = {"AES128", "AES192", "AES256", "DES", 0};
 const char *BLOCK_MODES[] = {"ECB", "CFB", "OFB", "CBC", 0};
 
-// These should go to the corresponding encrypt/encrypt.h file
-enum t_encrypt { AES128 = 1, AES192, AES256, DES };
-enum t_block { ECB = 1, CFB, OFB, CBC };
 
 enum t_errors {
   PORTER_NOT_BMP,

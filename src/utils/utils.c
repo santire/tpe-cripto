@@ -95,6 +95,19 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
     return -1;
   }
 
+  printf("bfSize: %u\n", bmp->fh.bfSize);
+  printf("Image Offset: %u\n", bmp->fh.imageDataOffset);
+  printf("biSize: %u\n", bmp->ih.biSize);
+  printf("width: %d\n", bmp->ih.width);
+  printf("height: %d\n", bmp->ih.height);
+  printf("planes: %u\n", bmp->ih.planes);
+  printf("bitPix: %u\n", bmp->ih.bitPix);
+  printf("compression: %u\n", bmp->ih.biCompression);
+  printf("Image size: %u\n", bmp->ih.biSizeImage);
+  printf("biXPelsPerMeter: %d\n", bmp->ih.biXPelsPerMeter);
+  printf("biYPelsPerMeter: %d\n", bmp->ih.biYPelsPerMeter);
+  printf("biClrUsed: %u\n", bmp->ih.biClrUsed);
+  printf("biClrImportant: %u\n", bmp->ih.biClrImportant);
   // Move fp to the beginning of bitmap data
   fseek(fp, bmp->fh.imageDataOffset, SEEK_SET);
 

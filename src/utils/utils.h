@@ -1,49 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
+#include "../types.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <byteswap.h>
-
-// https://stackoverflow.com/questions/17967480/parse-read-bitmap-file-in-c
-// https://stackoverflow.com/questions/14279242/read-bitmap-file-into-structure
-
-typedef struct __attribute__((__packed__)) {
-  unsigned char fileMarker1;
-  unsigned char fileMarker2;
-  unsigned int bfSize;
-  uint16_t unused1;
-  uint16_t unused2;
-  unsigned int imageDataOffset;
-} FILEHEADER;
-
-typedef struct __attribute__((__packed__)) {
-  unsigned int biSize;
-  int width;
-  int height;
-  uint16_t planes;
-  uint16_t bitPix;
-  unsigned int biCompression;
-  unsigned int biSizeImage;
-  int biXPelsPerMeter;
-  int biYPelsPerMeter;
-  unsigned int biClrUsed;
-  unsigned int biClrImportant;
-} INFOHEADER;
-
-typedef struct __attribute__((__packed__)) {
-  unsigned char b;
-  unsigned char g;
-  unsigned char r;
-} IMAGE;
-
-struct t_bmp {
-  FILEHEADER fh;
-  INFOHEADER ih;
-  unsigned char *img;
-};
-
 
 // Returns file extension.
 // TODO: Probably should change to (const char *filename, char *dest) -> int
