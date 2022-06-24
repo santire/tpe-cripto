@@ -1,7 +1,7 @@
 #ifndef EMBED_H
 #define EMBED_H
-#include "../types.h"
-#include "../utils/utils.h"
+#include "types.h"
+#include "utils.h"
 
 struct t_embed_params {
   FILE *porter_file;

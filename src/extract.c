@@ -1,5 +1,5 @@
-#include "extract.h"
-#include "../utils/utils.h"
+#include "includes/extract.h"
+#include "includes/utils.h"
 
 int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n);
 

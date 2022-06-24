@@ -1,7 +1,7 @@
 #ifndef EXTRACT_H
 #define EXTRACT_H
-#include "../types.h"
-#include "../utils/utils.h"
+#include "types.h"
+#include "utils.h"
 
 struct t_extract_params {
   FILE *porter_file;

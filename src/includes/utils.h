@@ -1,10 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include "../types.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "types.h"
 
 // Returns file extension.
 // TODO: Probably should change to (const char *filename, char *dest) -> int

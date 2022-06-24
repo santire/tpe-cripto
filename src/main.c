@@ -1,6 +1,6 @@
-#include "embed/embed.h"
-#include "extract/extract.h"
-#include "utils/utils.h"
+#include "includes/embed.h"
+#include "includes/extract.h"
+#include "includes/utils.h"
 
 #include <argp.h>
 #include <stdio.h>

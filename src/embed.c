@@ -1,5 +1,5 @@
-#include "embed.h"
-#include "../utils/utils.h"
+#include "includes/embed.h"
+#include "includes/utils.h"
 
 int embed_lsbn(struct t_bmp *bmp, char *message, int message_size, int n);
 
