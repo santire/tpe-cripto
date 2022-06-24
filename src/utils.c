@@ -1,4 +1,5 @@
 #include "includes/utils.h"
+#include <byteswap.h>
 
 const char *get_file_ext(const char *filename) {
   const char *dot = strrchr(filename, '.');
