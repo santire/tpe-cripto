@@ -14,7 +14,6 @@ const char *STEG_MODES[] = {"LSB1", "LSB4", "LSBI", 0};
 const char *ENCRYPT_MODES[] = {"AES128", "AES192", "AES256", "DES", 0};
 const char *BLOCK_MODES[] = {"ECB", "CFB", "OFB", "CBC", 0};
 
-
 enum t_errors {
   PORTER_NOT_BMP,
   OUTPUT_NOT_BMP,
@@ -307,7 +306,10 @@ int main(int argc, char **argv) {
 
     if (arguments.cypher_mode) {
       printf("Encrypting message...\n");
-      // int error = encrypt(secret_message, secret_size,
+      // Encrypts message leaving the encrypted message in secret_message
+      // and the encrypted size in secret_size
+
+      // int error = encrypt(&secret_message, &secret_size,
       // arguments.encryption_algorithm, arguments.block_algorithm)
     }
 
