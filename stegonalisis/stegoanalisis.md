@@ -10,3 +10,11 @@ usando exiftool vimos que frozen y topgun0 son bmp v5. Estos tienen compresion y
 buenosaires era v3 pero no funcionaba con nuestros algoritmos, asi que parece que no es un tipo de LSB insertion.
 
 por lo tanto lo abrimos con un editor de hex y al final del archivo decia "la password es desafiar" suponemos que es la password de del archivo que esta encriptado.
+
+Probando desencriptar el archivo frozen
+
+```
+bin/a.out --extract -a=AES128 --pass=desafiar -m=ECB --steg=LSB1 -o decrypted -p bmp_files/grupo20/frozen.bmp
+```
+
+se obiene el archivo decrypted.wmv que es un video
