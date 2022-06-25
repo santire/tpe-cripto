@@ -63,21 +63,6 @@ struct arguments {
   enum t_block block_algorithm;
   const char *password;
 };
-void print_arguments(struct arguments a) {
-  printf("###############################\n");
-  printf("Arguments: \n");
-  printf("Embed mode: %d\n", a.embed_mode);
-  printf("Extract mode: %d\n", a.extract_mode);
-  printf("Input file: %s\n", a.secret_file);
-  printf("Porter file: %s\n", a.porter_file);
-  printf("Output file: %s\n", a.out_file);
-  printf("Steg mode: %d\n", a.steg_mode);
-  printf("cypher mode: %d\n", a.cypher_mode);
-  printf("Encryption algorithm: %d\n", a.encryption_algorithm);
-  printf("Block algorithm: %d\n", a.block_algorithm);
-  printf("Password: %s\n", a.password);
-  printf("###############################\n");
-}
 
 static int parse_opt(int key, char *arg, struct argp_state *state) {
   struct arguments *a = state->input;
@@ -166,9 +151,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
       arg = *arg == '=' ? arg + 1 : arg;
       int i = 0;
       while (ENCRYPT_MODES[i]) {
-        printf("%s\n", arg);
         if (strcasecmp(ENCRYPT_MODES[i], arg) == 0) {
-          printf("%s\n", arg);
           a->encryption_algorithm = i + 1;
           break;
         }
@@ -243,7 +226,7 @@ static int parse_opt(int key, char *arg, struct argp_state *state) {
     for (int i = 0; i < NO_ERRORS; i++) {
       if (ERRORS[i]) {
         arg_errors = 1;
-        printf("ERROR: %s\n", error_messages[i]);
+        fprintf(stderr, "ERROR: %s\n", error_messages[i]);
       }
     }
     if (arg_errors) {
@@ -292,7 +275,7 @@ int main(int argc, char **argv) {
 
   int retval = argp_parse(&argp, argc, argv, 0, 0, &arguments);
   if (retval != 0) {
-    printf("%d\n", retval);
+    fprintf(stderr, "argparse error code: %d\n", retval);
     return retval;
   }
 
@@ -305,8 +288,14 @@ int main(int argc, char **argv) {
     unsigned int secret_size =
         read_secret_message(arguments.secret_file, &secret_message);
 
+    if (secret_size == 0) {
+      printf("Couldn't read file, aborting.\n");
+      remove(arguments.out_file);
+      exit(1);
+    }
+
     if (arguments.cypher_mode) {
-      printf("Encrypting message...\n");
+      printf("Encrypting file %s...\n", arguments.secret_file);
       // Encrypts message leaving the encrypted message in secret_message
       // and the encrypted size in secret_size
       struct t_encrypt_params encrypt_params = {
@@ -319,20 +308,27 @@ int main(int argc, char **argv) {
 
     struct t_embed_params embed_params = {porter_file, secret_message,
                                           secret_size, arguments.steg_mode};
-    printf("Embedding file...\n");
+
+    printf("Embedding %s%s into %s...\n",
+           arguments.cypher_mode ? "encrypted " : "", arguments.secret_file,
+           arguments.porter_file);
     struct t_bmp out_bmp;
-    embed(&embed_params, &out_bmp);
+    if (0 == embed(&embed_params, &out_bmp)) {
+      write_bmp_file(output_file, &out_bmp);
+      printf("Wrote file %s succesfully\n", arguments.out_file);
+    } else {
+      printf("Couldn't write file.\n");
+      remove(arguments.out_file);
+    }
 
-    write_bmp_file(output_file, &out_bmp);
-    printf("Wrote file %s succesfully\n", arguments.out_file);
     fclose(output_file);
-
     free(out_bmp.img);
     free(secret_message);
+    exit(1);
   }
 
   if (arguments.extract_mode) {
-    printf("Extracting file...\n");
+    printf("Extracting file from %s...\n", arguments.porter_file);
     unsigned char *message = NULL;
     unsigned char *output = NULL;
     unsigned char *ext = NULL;
@@ -340,7 +336,10 @@ int main(int argc, char **argv) {
     struct t_extract_params extract_params = {
         porter_file, &output, &message_size, arguments.steg_mode};
     struct t_bmp in_bmp;
-    extract(&extract_params, &in_bmp);
+    if (0 != extract(&extract_params, &in_bmp)) {
+      printf("Aborting.\n");
+      exit(1);
+    }
 
     if (arguments.cypher_mode) {
       printf("Decrypting message...\n");
@@ -353,7 +352,7 @@ int main(int argc, char **argv) {
 
       message_size = 0;
       unsigned char *o = output;
-      message_size |= (o[0] << 24); 
+      message_size |= (o[0] << 24);
       message_size |= (o[1] << 16);
       message_size |= (o[2] << 8);
       message_size |= (o[3]);

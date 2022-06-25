@@ -75,6 +75,24 @@ run_encrypted_embedding_test() {
   ((TESTS_RUN+=1))
 }
 
+run_large_file_error_test() {
+  echo "#############################################################"
+  echo "-------------------------------------------------------------"
+  echo "running embedding too large file test"
+  echo "-------------------------------------------------------------"
+  $STEGOBMP --embed -i video.wmv -p base_files/lado.bmp --steg=$1 -o tiny.bmp
+  if test -f "tiny.bmp"; then
+      echo "tiny embed test failed"
+    else
+      ((TESTS_PASSED+=1))
+      echo "tiny embed test passed"
+  fi
+  echo "-------------------------------------------------------------"
+  echo "#############################################################"
+  echo ""
+  ((TESTS_RUN+=1))
+}
+
 echo "#############################################################"
 echo "-------------------------------------------------------------"
 echo "RUNNING TEST SUITE"
@@ -95,6 +113,8 @@ run_encrypted_extraction_test LSBI aes256ofb AES256 OFB secreto
 
 run_encrypted_embedding_test LSB1 aes192cbc AES192 CBC escondite 
 run_encrypted_embedding_test LSBI aes256ofb AES256 OFB secreto
+
+run_large_file_error_test LSB1
 
 echo "#############################################################"
 echo "-------------------------------------------------------------"

@@ -5,7 +5,11 @@ int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n);
 int extract_lsbi(struct t_bmp *bmp, unsigned char **output);
 
 int extract(struct t_extract_params *p, struct t_bmp *bmp) {
-  parse_bmp_file(p->porter_file, bmp);
+  int error = parse_bmp_file(p->porter_file, bmp);
+  if (error < 0) {
+    fprintf(stderr, "Error parsing BMP file.\n");
+    return error;
+  }
 
   switch (p->steg_type) {
 

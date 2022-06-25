@@ -17,9 +17,8 @@ unsigned int read_file(FILE *fp, unsigned char **destination) {
       // Get the size of the file
       buff_size = ftell(fp);
       if (buff_size == -1) {
-        // TODO: Better error handling
-        fputs("Error reading file\n", stderr);
-        return -1;
+        fprintf(stderr, "Error reading file\n");
+        return 0;
       }
 
       // Allocate our buffer to that size
@@ -27,13 +26,11 @@ unsigned int read_file(FILE *fp, unsigned char **destination) {
 
       // Go back to the beginning of the file
       if (fseek(fp, 0L, SEEK_SET) != 0) {
-        // TODO: Better error handling
-        fputs("Error reading file\n", stderr);
         return -1;
       }
 
       if (ferror(fp) != 0) {
-        fputs("Error reading file\n", stderr);
+        fprintf(stderr, "Error reading file\n");
       }
 
       if (*destination) {
@@ -48,12 +45,18 @@ unsigned int read_file(FILE *fp, unsigned char **destination) {
 unsigned int read_secret_message(const char *filename, unsigned char **data) {
   const char *ext = strrchr(filename, '.');
   unsigned char *buffer = NULL;
-  unsigned int buff_size = -1;
+  unsigned int buff_size = 0;
   unsigned int be_buff_size = 0;
   FILE *fp = fopen(filename, "rb");
   int byte_size = sizeof(unsigned int);
 
   buff_size = read_file(fp, &buffer);
+  if (buff_size == 0) {
+    free(buffer);
+    fclose(fp);
+    return 0;
+  }
+
   int num = 1; // 00 01
   if (*(char *)&num == 1) {
     // Little Endian
@@ -84,7 +87,7 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
 
   // Verify that this is a .BMP file
   if (bmp->fh.fileMarker1 != 'B' || bmp->fh.fileMarker2 != 'M') {
-    printf("NOT A VALID BMP\n");
+    fprintf(stderr, "File is not a valid BMP\n");
     return -1;
   }
 
@@ -92,7 +95,7 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
 
   // Verify no compression
   if (bmp->ih.biCompression != 0) {
-    printf("BMP FILE MUST NOT BE COMPRESSED\n");
+    fprintf(stderr, "Porter BMP file must not be compressed\n");
     return -1;
   }
 
@@ -105,7 +108,7 @@ int parse_bmp_file(FILE *fp, struct t_bmp *bmp) {
   // Verify memory allocation
   if (!bmp->img) {
     free(bmp->img);
-    printf("COULDNT ALLOCATE BMP IMAGE MEM\n");
+    fprintf(stderr, "Couldn't allocate memory to load porter bmp\n");
     return -1;
   }
 

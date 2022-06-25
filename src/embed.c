@@ -7,23 +7,36 @@ int embed_lsbi(struct t_bmp *bmp, unsigned char *message, int message_size);
 
 int embed(struct t_embed_params *p, struct t_bmp *bmp) {
   parse_bmp_file(p->porter_file, bmp);
+  int error = parse_bmp_file(p->porter_file, bmp);
+  if (error < 0) {
+    fprintf(stderr, "Error parsing BMP file.\n");
+    return error;
+  }
+
+  int max_size = 0;
 
   switch (p->steg_type) {
 
   case LSB1:
     printf("Embedding with LSB1\n");
-    embed_lsbn(bmp, p->secret_data, p->secret_size, 1);
+    max_size = embed_lsbn(bmp, p->secret_data, p->secret_size, 1);
     break;
   case LSB4:
     printf("Embedding with LSB4\n");
-    embed_lsbn(bmp, p->secret_data, p->secret_size, 4);
+    max_size = embed_lsbn(bmp, p->secret_data, p->secret_size, 4);
     break;
   case LSBI:
     printf("Embedding with LSBI\n");
-    embed_lsbi(bmp, p->secret_data, p->secret_size);
+    max_size = embed_lsbi(bmp, p->secret_data, p->secret_size);
     break;
 
   default:
+    return -1;
+  }
+
+  if (max_size != 0) {
+    fprintf(stderr, "Error embedding file, max size is %d but file is %d\n",
+            max_size, p->secret_size);
     return -1;
   }
 
@@ -32,6 +45,13 @@ int embed(struct t_embed_params *p, struct t_bmp *bmp) {
 
 int embed_lsbn(struct t_bmp *bmp, unsigned char *message, int message_size,
                int n) {
+
+  // Check if bmp is big enough for message
+  unsigned int max_size = (bmp->ih.biSizeImage * n) / 8;
+  if (message_size > max_size) {
+    return max_size;
+  }
+
   unsigned char mask = (1 << n) - 1;
   int img_offset = 0;
 
@@ -46,6 +66,13 @@ int embed_lsbn(struct t_bmp *bmp, unsigned char *message, int message_size,
 }
 
 int embed_lsbi(struct t_bmp *bmp, unsigned char *message, int message_size) {
+
+  // Check if bmp is big enough for message
+  int max_size = (bmp->ih.biSizeImage - 4) / 8; // First 4 bytes are for pattern
+  if (message_size > max_size) {
+    return max_size;
+  }
+
   struct t_group groups[4] = {0};
   unsigned char mask = (1 << 1) - 1;
   int img_offset = 4; // First 4 bytes are for pattern
