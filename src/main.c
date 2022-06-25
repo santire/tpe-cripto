@@ -305,8 +305,6 @@ int main(int argc, char **argv) {
     unsigned int secret_size =
         read_secret_message(arguments.secret_file, &secret_message);
 
-    printf("Before encrypting: \n");
-    printf("secret_size: %u\n", secret_size);
     if (arguments.cypher_mode) {
       printf("Encrypting message...\n");
       // Encrypts message leaving the encrypted message in secret_message
@@ -317,8 +315,6 @@ int main(int argc, char **argv) {
       if (encrypt(&encrypt_params) != 0) {
         // TODO: Error handling
       }
-      printf("After encrypting: \n");
-      printf("secret_size: %u\n", secret_size);
     }
 
     struct t_embed_params embed_params = {porter_file, secret_message,
@@ -328,6 +324,7 @@ int main(int argc, char **argv) {
     embed(&embed_params, &out_bmp);
 
     write_bmp_file(output_file, &out_bmp);
+    printf("Wrote file %s succesfully\n", arguments.out_file);
     fclose(output_file);
 
     free(out_bmp.img);
@@ -346,8 +343,6 @@ int main(int argc, char **argv) {
     extract(&extract_params, &in_bmp);
 
     if (arguments.cypher_mode) {
-      printf("Before decrypting: \n");
-      printf("secret_size: %u\n", message_size);
       printf("Decrypting message...\n");
       struct t_encrypt_params decrypt_params = {
           &output, &message_size, arguments.encryption_algorithm,
@@ -358,9 +353,9 @@ int main(int argc, char **argv) {
 
       message_size = 0;
       unsigned char *o = output;
-      message_size |= (o[0] << 24); // 0xX1 0x00 0x00 0x00
-      message_size |= (o[1] << 16); // 0xX1 0x00 0x00 0x00
-      message_size |= (o[2] << 8);  // 0xX1 0x00 0x00 0x00
+      message_size |= (o[0] << 24); 
+      message_size |= (o[1] << 16);
+      message_size |= (o[2] << 8);
       message_size |= (o[3]);
     }
 
@@ -373,9 +368,8 @@ int main(int argc, char **argv) {
 
     FILE *output_file = fopen(filename, "wb+");
 
-    printf("message size: %u\n", message_size);
-
     fwrite(message, sizeof(char), message_size, output_file);
+    printf("Wrote file %s succesfully\n", filename);
     fclose(output_file);
 
     free(output);
@@ -385,7 +379,5 @@ int main(int argc, char **argv) {
 
   fclose(porter_file);
 
-  // Debug
-  // print_arguments(arguments);
   return 0;
 }

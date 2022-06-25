@@ -2,6 +2,7 @@
 #include "includes/utils.h"
 
 int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n);
+int extract_lsbi(struct t_bmp *bmp, unsigned char **output);
 
 int extract(struct t_extract_params *p, struct t_bmp *bmp) {
   parse_bmp_file(p->porter_file, bmp);
@@ -18,6 +19,7 @@ int extract(struct t_extract_params *p, struct t_bmp *bmp) {
     break;
   case LSBI:
     printf("Extracting with LSBI\n");
+    extract_lsbi(bmp, p->output);
     break;
 
   default:
@@ -39,7 +41,6 @@ int extract(struct t_extract_params *p, struct t_bmp *bmp) {
 int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n) {
   // Calculate max possible output size
   int max_size = (bmp->ih.biSizeImage * n) / 8;
-  printf("max size: %d\n", max_size);
   *output = (unsigned char *)calloc(max_size, sizeof(unsigned char));
 
   unsigned char mask = (1 << n) - 1;
@@ -52,6 +53,38 @@ int extract_lsbn(struct t_bmp *bmp, unsigned char **output, int n) {
     if (bit_position < 0) {
       byte++;
       bit_position = 8 - n;
+    }
+  }
+
+  return 0;
+}
+
+int extract_lsbi(struct t_bmp *bmp, unsigned char **output) {
+
+  // Calculate max possible output size
+  int max_size = (bmp->ih.biSizeImage) / 8;
+  *output = (unsigned char *)calloc(max_size, sizeof(unsigned char));
+
+  unsigned char mask = (1 << 1) - 1;
+  int byte = 0;
+  int bit_position = 7;
+
+  int invert[4] = {0};
+  for (int i = 0; i < bmp->ih.biSizeImage; i++) {
+    if (i < 4) {
+      invert[i] |= bmp->img[i] & mask;
+    } else {
+      int g_i = (bmp->img[i] >> 1) & 0x03;
+      if (invert[g_i]) {
+        (*output)[byte] |= (0x01 ^ (bmp->img[i] & mask)) << bit_position;
+      } else {
+        (*output)[byte] |= (bmp->img[i] & mask) << bit_position;
+      }
+      bit_position -= 1;
+      if (bit_position < 0) {
+        byte++;
+        bit_position = 7;
+      }
     }
   }
 

@@ -35,15 +35,16 @@ typedef struct __attribute__((__packed__)) {
   unsigned int biClrImportant;
 } INFOHEADER;
 
-typedef struct __attribute__((__packed__)) {
-  unsigned char b;
-  unsigned char g;
-  unsigned char r;
-} IMAGE;
-
 struct t_bmp {
   FILEHEADER fh;
   INFOHEADER ih;
   unsigned char *img;
 };
+
+struct t_group {
+  int count;
+  int diff;
+  int invert;
+};
+
 #endif
