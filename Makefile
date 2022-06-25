@@ -27,6 +27,10 @@ $(BUILD_DIR)/%.c.o: %.c
 
 .PHONY: clean
 
+tests:
+	cd tests; ./run_tests.sh;
+	
+
 clean:
 	$(RM) -r $(BUILD_DIR)
 
