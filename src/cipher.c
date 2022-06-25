@@ -35,7 +35,7 @@ int encrypt(struct t_encrypt_params *p) {
   const EVP_CIPHER *cipher_type =
       get_cipher_type(p->enc_algorithm, p->block_algorithm);
 
-  if (1 != EVP_BytesToKey(cipher_type, EVP_md5(), NULL,
+  if (1 != EVP_BytesToKey(cipher_type, EVP_sha256(), NULL,
                           (const unsigned char *)p->password,
                           strlen(p->password), 1, key, iv)) {
     ERR_print_errors_fp(stderr);
@@ -54,7 +54,6 @@ int encrypt(struct t_encrypt_params *p) {
   // Initialize encription operation
   if (1 != EVP_EncryptInit_ex(ctx, cipher_type, NULL, key, iv)) {
     ERR_print_errors_fp(stderr);
-    return -1;
   }
   /*
    * Provide the message to be encrypted, and obtain the encrypted output.
@@ -64,7 +63,6 @@ int encrypt(struct t_encrypt_params *p) {
                              (int)*p->secret_size)) {
 
     ERR_print_errors_fp(stderr);
-    return -1;
   }
   ciphertext_len = len;
 
@@ -74,7 +72,6 @@ int encrypt(struct t_encrypt_params *p) {
    */
   if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) {
     ERR_print_errors_fp(stderr);
-    return -1;
   }
 
   ciphertext_len += len;
@@ -128,7 +125,7 @@ int decrypt(struct t_encrypt_params *p) {
   const EVP_CIPHER *cipher_type =
       get_cipher_type(p->enc_algorithm, p->block_algorithm);
 
-  if (1 != EVP_BytesToKey(cipher_type, EVP_md5(), NULL,
+  if (1 != EVP_BytesToKey(cipher_type, EVP_sha256(), NULL,
                           (const unsigned char *)p->password,
                           strlen(p->password), 1, key, iv)) {
     ERR_print_errors_fp(stderr);
