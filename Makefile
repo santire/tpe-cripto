@@ -1,5 +1,5 @@
 CC := gcc
-TARGET_EXEC ?= a.out
+TARGET_EXEC ?= stegobmp
 
 BUILD_DIR ?= ./bin
 SRC_DIRS ?= ./src
