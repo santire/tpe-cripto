@@ -10,10 +10,14 @@ cd tests/
 STEGOBMP=../bin/stegobmp
 EXPECTED=expected.png
 
+TESTS_RUN=0
+TESTS_PASSED=0
+
 
 file_cmp() {
   if cmp -s -- "$1" "$2"; then
     echo "$3 passed"
+    ((TESTS_PASSED+=1))
   else
     echo "$3 failed"
   fi
@@ -29,6 +33,7 @@ run_plain_extraction_test() {
   echo "-------------------------------------------------------------"
   echo "#############################################################"
   echo ""
+  ((TESTS_RUN+=1))
 }
 
 run_plain_embedding_test() {
@@ -41,6 +46,33 @@ run_plain_embedding_test() {
   echo "-------------------------------------------------------------"
   echo "#############################################################"
   echo ""
+  ((TESTS_RUN+=1))
+}
+
+run_encrypted_extraction_test() {
+  echo "#############################################################"
+  echo "-------------------------------------------------------------"
+  echo "running encrypted extraction test $1 $2 pass: $2"
+  echo "-------------------------------------------------------------"
+  $STEGOBMP --extract -p base_files/lado${1}${2}.bmp --steg=$1 -o actual -a=$3 -m=$4 --pass=$5
+  file_cmp "expected.png" "actual.png" "test $1"
+  echo "-------------------------------------------------------------"
+  echo "#############################################################"
+  echo ""
+  ((TESTS_RUN+=1))
+}
+
+run_encrypted_embedding_test() {
+  echo "#############################################################"
+  echo "-------------------------------------------------------------"
+  echo "running encrypted embedding test $1 $2 pass: $2"
+  echo "-------------------------------------------------------------"
+  $STEGOBMP --embed -i expected.png -p base_files/lado.bmp --steg=$1 -o actual.bmp -a=$3 -m=$4 --pass=$5
+  file_cmp "base_files/lado${1}${2}.bmp" "actual.bmp" "test $1"
+  echo "-------------------------------------------------------------"
+  echo "#############################################################"
+  echo ""
+  ((TESTS_RUN+=1))
 }
 
 echo "#############################################################"
@@ -58,6 +90,12 @@ run_plain_embedding_test LSB1
 run_plain_embedding_test LSB4
 run_plain_embedding_test LSBI
 
+run_encrypted_extraction_test LSB1 aes192cbc AES192 CBC escondite 
+run_encrypted_extraction_test LSBI aes256ofb AES256 OFB secreto
+
+run_encrypted_embedding_test LSB1 aes192cbc AES192 CBC escondite 
+run_encrypted_embedding_test LSBI aes256ofb AES256 OFB secreto
+
 echo "#############################################################"
 echo "-------------------------------------------------------------"
 echo "CLEANING UP"
@@ -65,7 +103,15 @@ echo "-------------------------------------------------------------"
 echo "#############################################################"
 echo ""
 
-rm actual.bmp actual.png
+echo ""
+echo "#############################################################"
+echo "-------------------------------------------------------------"
+echo "PASSED $TESTS_PASSED/$TESTS_RUN"
+echo "-------------------------------------------------------------"
+echo "#############################################################"
+echo ""
+
+rm -f actual.bmp actual.png
 
 cd ../
 make clean
