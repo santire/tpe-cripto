@@ -1,3 +1,4 @@
+#include "includes/cipher.h"
 #include "includes/embed.h"
 #include "includes/extract.h"
 #include "includes/utils.h"
@@ -300,17 +301,31 @@ int main(int argc, char **argv) {
   if (arguments.embed_mode) {
 
     FILE *output_file = fopen(arguments.out_file, "wb+");
-    char *secret_message = NULL;
-    int secret_size =
+    unsigned char *secret_message = NULL;
+    unsigned int secret_size =
         read_secret_message(arguments.secret_file, &secret_message);
 
+    printf("Before encrypting: \n");
+    printf("secret_size: %u\n", secret_size);
     if (arguments.cypher_mode) {
       printf("Encrypting message...\n");
       // Encrypts message leaving the encrypted message in secret_message
       // and the encrypted size in secret_size
+      struct t_encrypt_params encrypt_params = {
+          &secret_message, &secret_size, arguments.encryption_algorithm,
+          arguments.block_algorithm, arguments.password};
+      if (encrypt(&encrypt_params) != 0) {
+        // TODO: Error handling
+      }
+      printf("After encrypting: \n");
+      printf("secret_size: %u\n", secret_size);
 
-      // int error = encrypt(&secret_message, &secret_size,
-      // arguments.encryption_algorithm, arguments.block_algorithm)
+      // Encryption debug
+      // printf("WRITING test_encrypted.txt\n");
+      // FILE *test_fp = fopen("test_encrypted.txt", "wb+");
+      // printf("secret size: %d\n", secret_size);
+      // fwrite(secret_message, secret_size, sizeof(unsigned char), test_fp);
+      // fclose(test_fp);
     }
 
     struct t_embed_params embed_params = {porter_file, secret_message,
@@ -327,18 +342,41 @@ int main(int argc, char **argv) {
   }
 
   if (arguments.extract_mode) {
-    if (arguments.cypher_mode) {
-      printf("Decrypting message...\n");
-    }
     printf("Extracting file...\n");
-
+    unsigned char *message = NULL;
     unsigned char *output = NULL;
     unsigned char *ext = NULL;
     unsigned int message_size = 0;
     struct t_extract_params extract_params = {
-        porter_file, &output, &ext, &message_size, arguments.steg_mode};
+        porter_file, &output, &message_size, arguments.steg_mode};
     struct t_bmp in_bmp;
     extract(&extract_params, &in_bmp);
+
+    printf("Before decrypting: \n");
+    printf("secret_size: %u\n", message_size);
+
+    if (arguments.cypher_mode) {
+      printf("Decrypting message...\n");
+      struct t_encrypt_params decrypt_params = {
+          &output, &message_size, arguments.encryption_algorithm,
+          arguments.block_algorithm, arguments.password};
+      if (decrypt(&decrypt_params) != 0) {
+        // TODO: Error handling
+      }
+
+      message = output + sizeof(unsigned int);
+
+      message_size = 0;
+      unsigned char *o = output;
+      message_size |= (o[0] << 24);
+      message_size |= (o[1] << 16);
+      message_size |= (o[2] << 8);
+      message_size |= (o[3]);
+    } else {
+      message = output;
+    }
+
+    ext = message + message_size;
     char *filename =
         (char *)malloc(strlen(arguments.out_file) + strlen((char *)ext) + 1);
     strcpy(filename, arguments.out_file);
@@ -348,8 +386,7 @@ int main(int argc, char **argv) {
 
     printf("message size: %u\n", message_size);
 
-    fwrite(output + sizeof(unsigned int), sizeof(char), message_size,
-           output_file);
+    fwrite(message, sizeof(char), message_size, output_file);
     fclose(output_file);
 
     free(output);
@@ -360,10 +397,6 @@ int main(int argc, char **argv) {
   fclose(porter_file);
 
   // Debug
-  print_arguments(arguments);
-  printf("sizeof(char)=%lu\n", sizeof(char));
-  printf("sizeof(unsigned char)=%lu\n", sizeof(unsigned char));
-  printf("sizeof(size_t)=%lu\n", sizeof(size_t));
-
+  // print_arguments(arguments);
   return 0;
 }

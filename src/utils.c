@@ -8,7 +8,7 @@ const char *get_file_ext(const char *filename) {
   return dot + 1;
 }
 
-int read_file(FILE *fp, char **destination) {
+unsigned int read_file(FILE *fp, unsigned char **destination) {
   unsigned int buff_size = -1;
 
   if (fp != NULL) {
@@ -45,9 +45,9 @@ int read_file(FILE *fp, char **destination) {
   return buff_size;
 }
 
-int read_secret_message(const char *filename, char **data) {
+unsigned int read_secret_message(const char *filename, unsigned char **data) {
   const char *ext = strrchr(filename, '.');
-  char *buffer = NULL;
+  unsigned char *buffer = NULL;
   unsigned int buff_size = -1;
   unsigned int be_buff_size = 0;
   FILE *fp = fopen(filename, "rb");
@@ -66,7 +66,7 @@ int read_secret_message(const char *filename, char **data) {
   int ext_size = strlen(ext) + 1; // one for \0
   int message_size = byte_size + buff_size + ext_size;
 
-  *data = (char *)calloc(message_size, sizeof(char));
+  *data = (unsigned char *)calloc(message_size, sizeof(char));
 
   memcpy(*data, &be_buff_size, byte_size);
   memcpy((*data) + byte_size, buffer, buff_size);

@@ -7,8 +7,6 @@ struct t_extract_params {
   FILE *porter_file;
 
   unsigned char **output;
-  unsigned char **ext;
-
   unsigned int *message_size;
 
   enum t_steg steg_type;

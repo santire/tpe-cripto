@@ -10,10 +10,12 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -pedantic -std=c99 -Wall
+CPPFLAGS ?= $(INC_FLAGS) -pedantic -std=c99 -Wall -lcrypto
+LDFLAGS=-lssl -lcrypto
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+
 
 
 # c source

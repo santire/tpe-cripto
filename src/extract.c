@@ -13,11 +13,11 @@ int extract(struct t_extract_params *p, struct t_bmp *bmp) {
     extract_lsbn(bmp, p->output, 1);
     break;
   case LSB4:
-    printf("Embedding with LSB4\n");
+    printf("Extracting with LSB4\n");
     extract_lsbn(bmp, p->output, 4);
     break;
   case LSBI:
-    printf("Embedding with LSBI\n");
+    printf("Extracting with LSBI\n");
     break;
 
   default:
@@ -31,13 +31,8 @@ int extract(struct t_extract_params *p, struct t_bmp *bmp) {
   message_size |= (o[1] << 16);
   message_size |= (o[2] << 8);
   message_size |= (o[3]);
-  printf("\n");
-  printf("message size?? %u\n", message_size);
 
   *p->message_size = message_size;
-  *p->ext = *p->output + message_size + sizeof(unsigned int);
-  printf("Extension? %s\n", *p->ext);
-
   return 0;
 }
 

@@ -1,7 +1,7 @@
 #include "includes/embed.h"
 #include "includes/utils.h"
 
-int embed_lsbn(struct t_bmp *bmp, char *message, int message_size, int n);
+int embed_lsbn(struct t_bmp *bmp, unsigned char *message, int message_size, int n);
 
 int embed(struct t_embed_params *p, struct t_bmp *bmp) {
   parse_bmp_file(p->porter_file, bmp);
@@ -27,7 +27,7 @@ int embed(struct t_embed_params *p, struct t_bmp *bmp) {
   return 0;
 }
 
-int embed_lsbn(struct t_bmp *bmp, char *message, int message_size, int n) {
+int embed_lsbn(struct t_bmp *bmp, unsigned char *message, int message_size, int n) {
   unsigned char mask = (1 << n) - 1;
   int img_offset = 0;
 

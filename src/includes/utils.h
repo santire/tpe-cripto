@@ -11,8 +11,8 @@ int write_bmp_file(FILE *fp, struct t_bmp *bmp);
 
 // Reads message to hide and loads it into memory
 // as (Size (4 bytes) || message || extension). Returns size.
-int read_secret_message(const char *filename, char **data);
+unsigned int read_secret_message(const char *filename, unsigned char **data);
 
 // Reads message to hide and loads it into memory. Returns size.
-int read_file(FILE *fp, char **destination);
+unsigned int read_file(FILE *fp, unsigned char **destination);
 #endif

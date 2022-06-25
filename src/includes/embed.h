@@ -6,7 +6,7 @@
 struct t_embed_params {
   FILE *porter_file;
 
-  char *secret_data;
+  unsigned char *secret_data;
   int secret_size;
 
   enum t_steg steg_type;
