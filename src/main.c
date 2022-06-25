@@ -352,10 +352,10 @@ int main(int argc, char **argv) {
     struct t_bmp in_bmp;
     extract(&extract_params, &in_bmp);
 
-    printf("Before decrypting: \n");
-    printf("secret_size: %u\n", message_size);
 
     if (arguments.cypher_mode) {
+    printf("Before decrypting: \n");
+    printf("secret_size: %u\n", message_size);
       printf("Decrypting message...\n");
       struct t_encrypt_params decrypt_params = {
           &output, &message_size, arguments.encryption_algorithm,
@@ -373,7 +373,7 @@ int main(int argc, char **argv) {
       message_size |= (o[2] << 8);
       message_size |= (o[3]);
     } else {
-      message = output;
+      message = output + sizeof(unsigned int);
     }
 
     ext = message + message_size;
