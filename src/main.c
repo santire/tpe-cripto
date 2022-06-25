@@ -319,13 +319,6 @@ int main(int argc, char **argv) {
       }
       printf("After encrypting: \n");
       printf("secret_size: %u\n", secret_size);
-
-      // Encryption debug
-      // printf("WRITING test_encrypted.txt\n");
-      // FILE *test_fp = fopen("test_encrypted.txt", "wb+");
-      // printf("secret size: %d\n", secret_size);
-      // fwrite(secret_message, secret_size, sizeof(unsigned char), test_fp);
-      // fclose(test_fp);
     }
 
     struct t_embed_params embed_params = {porter_file, secret_message,
@@ -352,10 +345,9 @@ int main(int argc, char **argv) {
     struct t_bmp in_bmp;
     extract(&extract_params, &in_bmp);
 
-
     if (arguments.cypher_mode) {
-    printf("Before decrypting: \n");
-    printf("secret_size: %u\n", message_size);
+      printf("Before decrypting: \n");
+      printf("secret_size: %u\n", message_size);
       printf("Decrypting message...\n");
       struct t_encrypt_params decrypt_params = {
           &output, &message_size, arguments.encryption_algorithm,
@@ -364,18 +356,15 @@ int main(int argc, char **argv) {
         // TODO: Error handling
       }
 
-      message = output + sizeof(unsigned int);
-
       message_size = 0;
       unsigned char *o = output;
-      message_size |= (o[0] << 24);
-      message_size |= (o[1] << 16);
-      message_size |= (o[2] << 8);
+      message_size |= (o[0] << 24); // 0xX1 0x00 0x00 0x00
+      message_size |= (o[1] << 16); // 0xX1 0x00 0x00 0x00
+      message_size |= (o[2] << 8);  // 0xX1 0x00 0x00 0x00
       message_size |= (o[3]);
-    } else {
-      message = output + sizeof(unsigned int);
     }
 
+    message = output + sizeof(unsigned int);
     ext = message + message_size;
     char *filename =
         (char *)malloc(strlen(arguments.out_file) + strlen((char *)ext) + 1);

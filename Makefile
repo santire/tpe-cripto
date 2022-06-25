@@ -1,3 +1,4 @@
+CC := gcc
 TARGET_EXEC ?= a.out
 
 BUILD_DIR ?= ./bin

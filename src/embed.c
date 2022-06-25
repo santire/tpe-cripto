@@ -2,6 +2,7 @@
 #include "includes/utils.h"
 
 int embed_lsbn(struct t_bmp *bmp, unsigned char *message, int message_size, int n);
+int embed_lsbi(struct t_bmp *bmp, unsigned char *message, int message_size);
 
 int embed(struct t_embed_params *p, struct t_bmp *bmp) {
   parse_bmp_file(p->porter_file, bmp);
@@ -33,6 +34,22 @@ int embed_lsbn(struct t_bmp *bmp, unsigned char *message, int message_size, int 
 
   for (int i = 0; i < message_size; i++) {
     for (int j = 8 - n; j >= 0; j -= n, img_offset++) {
+      int combination = (bmp->img[img_offset] >> 1) & 0x03;
+
+      bmp->img[img_offset] ^= bmp->img[img_offset] & mask;
+      bmp->img[img_offset] |= (message[i] >> j) & mask;
+    }
+  }
+
+  return 0;
+}
+
+int embed_lsbi(struct t_bmp *bmp, unsigned char *message, int message_size) {
+  unsigned char mask = (1 << 1) - 1;
+  int img_offset = 0;
+
+  for (int i = 0; i < message_size; i++) {
+    for (int j = 7; j >= 0; j -= 1, img_offset++) {
       bmp->img[img_offset] ^= bmp->img[img_offset] & mask;
       bmp->img[img_offset] |= (message[i] >> j) & mask;
     }

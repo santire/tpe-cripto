@@ -1,6 +1,6 @@
 #include "includes/cipher.h"
 #include "includes/types.h"
-#include <byteswap.h>
+#include "includes/byteswap.h"
 #include <openssl/aes.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -87,7 +87,7 @@ int encrypt(struct t_encrypt_params *p) {
   int num = 1;
   if (*(char *)&num == 1) {
     // Little Endian
-    be_ciphertext_len = __bswap_32(ciphertext_len);
+    be_ciphertext_len = bswap_32(ciphertext_len);
   } else {
     // Big Endian
     be_ciphertext_len = ciphertext_len;
