@@ -25,7 +25,7 @@ $(BUILD_DIR)/%.c.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 
-.PHONY: clean
+.PHONY: clean tests
 
 tests:
 	cd tests; ./run_tests.sh;

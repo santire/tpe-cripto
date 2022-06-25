@@ -8,7 +8,6 @@ make
 cd tests/
 
 STEGOBMP=../bin/stegobmp
-OUT=actual.png
 EXPECTED=expected.png
 
 
@@ -26,7 +25,7 @@ run_plain_extraction_test() {
   echo "running extraction test $1"
   echo "-------------------------------------------------------------"
   $STEGOBMP --extract -p base_files/lado$1.bmp --steg=$1 -o actual
-  file_cmp $EXPECTED $OUT "test $1"
+  file_cmp $EXPECTED actual.png "test $1"
   echo "-------------------------------------------------------------"
   echo "#############################################################"
   echo ""
@@ -66,7 +65,7 @@ echo "-------------------------------------------------------------"
 echo "#############################################################"
 echo ""
 
-rm $OUT
+rm actual.bmp actual.png
 
 cd ../
 make clean
